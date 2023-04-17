@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class PlayerStats : MonoBehaviour
 {
     [SerializeField] float drainTime;
+    [SerializeField] float poison = 10f;
+    [SerializeField] Image healthBarFill;
 
     [SerializeField] float maxHealth = 100f;
     [SerializeField] float maxHunger = 100f;
@@ -24,12 +26,16 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] LayerMask waterMask;
     [SerializeField] LayerMask foodMask;
 
+    Color color;
+
     bool isInWater;
     bool isInFood;
 
     // Start is called before the first frame update
     void Start()
     {
+        color = healthBarFill.color;
+
         health = maxHealth;
         hunger = maxHunger;
         thirst = maxthrist;
@@ -97,5 +103,22 @@ public class PlayerStats : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(groundCheck.position,nutritionDistance);
+    }
+
+    void OnTriggerEnter(Collider collision)
+    {
+        if(collision.transform.CompareTag("Enemy"))
+        {
+            health -= poison;
+            Debug.Log("Förgiftad");
+            StartCoroutine(Poisoned());
+        }
+    }
+
+    IEnumerator Poisoned()
+    {
+        healthBarFill.color = Color.green;
+        yield return new WaitForSeconds(3);
+        healthBarFill.color = color;
     }
 }
