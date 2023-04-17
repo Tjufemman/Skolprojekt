@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Movement : MonoBehaviour
 {
@@ -28,11 +29,14 @@ public class Movement : MonoBehaviour
 
     [SerializeField] Animator anim;
 
+    [SerializeField] Slider staminaSlider;
+
     // Start is called before the first frame update
     void Start()
     {
         ogSpeed = speed;
         controller = GetComponent<CharacterController>();
+        staminaSlider.maxValue = maxStamina;
     }
 
     // Update is called once per frame
@@ -73,6 +77,8 @@ public class Movement : MonoBehaviour
             stamina += 2f * Time.deltaTime;
             anim.SetBool("Running", false);
         }
+
+        staminaSlider.value = stamina;
 
         #region Animation
 
