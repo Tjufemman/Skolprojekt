@@ -43,6 +43,7 @@ public class PlayerStats : MonoBehaviour
         healthSlider.maxValue = maxHealth;
         hungerSlider.maxValue = maxHunger;
         thirstSlider.maxValue = maxthrist;
+
     }
 
     [SerializeField] Slider healthSlider;
@@ -61,12 +62,19 @@ public class PlayerStats : MonoBehaviour
         thirst = Mathf.Min(thirst, maxthrist, 100);
         hunger = Mathf.Min(hunger, maxthrist, 100);
 
+        #region If Statements
+
         if (hunger <= 1 || thirst <= 1)
         {
             health += drainTime * 2f * Time.deltaTime;
         }
 
-        if(health <= 0)
+        if (hunger <= 1 && thirst <= 1)
+        {
+            health += drainTime * 5f * Time.deltaTime;
+        }
+
+        if (health <= 0)
         {
             Debug.Log("Death");
         }
@@ -89,6 +97,14 @@ public class PlayerStats : MonoBehaviour
             }
         }
 
+        if(pois == true)
+        {
+            health += drainTime * 3f * Time.deltaTime;
+        }
+
+        #endregion
+
+
         #region StatsBar
 
         healthSlider.value = health;
@@ -105,20 +121,31 @@ public class PlayerStats : MonoBehaviour
         Gizmos.DrawWireSphere(groundCheck.position,nutritionDistance);
     }
 
+    #region Collision
+
+    [SerializeField] GameObject destroyPartical;
+
     void OnTriggerEnter(Collider collision)
     {
         if(collision.transform.CompareTag("Enemy"))
         {
-            health -= poison;
             Debug.Log("Förgiftad");
+            Instantiate(destroyPartical, collision.transform.position, Quaternion.identity);
+            Destroy(collision.gameObject);
             StartCoroutine(Poisoned());
         }
     }
 
+    bool pois;
+
     IEnumerator Poisoned()
     {
-        healthBarFill.color = Color.green;
-        yield return new WaitForSeconds(3);
+        pois = true;
+        healthBarFill.color = Color.magenta;
+        yield return new WaitForSeconds(5);
         healthBarFill.color = color;
+        pois = false;
     }
+
+    #endregion
 }
