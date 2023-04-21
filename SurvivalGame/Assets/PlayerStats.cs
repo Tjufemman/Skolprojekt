@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class PlayerStats : MonoBehaviour
 {
     [SerializeField] float drainTime;
-    [SerializeField] float poison = 10f;
     [SerializeField] Image healthBarFill;
 
     [SerializeField] float maxHealth = 100f;
