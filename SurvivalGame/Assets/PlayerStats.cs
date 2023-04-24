@@ -4,6 +4,7 @@ using Unity.VisualScripting;
 using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.WSA;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -48,6 +49,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] Slider healthSlider;
     [SerializeField] Slider hungerSlider;
     [SerializeField] Slider thirstSlider;
+    [SerializeField] Slider interactSlider;
+
+    [SerializeField] GameObject interactCanvas;
+    public float duriation = 5f;
+    float timer;
 
     // Update is called once per frame
     void Update()
@@ -75,28 +81,46 @@ public class PlayerStats : MonoBehaviour
 
         if (health <= 0)
         {
-            Debug.Log("Death");
+            DeathTime();
         }
 
         if(isInWater)
         {
             //Display Drink
+            interactCanvas.SetActive(true);
+
             if(Input.GetKeyDown(KeyCode.E))
             {
-                thirst += nutrition;
+                ShowInteract();
+            } else
+            {
+                timer = 0;
             }
         }
+
+        if (!isInWater)
+            interactCanvas.SetActive(false);
 
         if (isInFood)
         {
-            //Display Drink
-            if (Input.GetKeyDown(KeyCode.E))
+            //Display Eat
+            interactCanvas.SetActive(true);
+
+            if (Input.GetKey(KeyCode.E))
             {
-                hunger += nutrition;
+                ShowInteract();
+            }
+            else if(Input.GetKeyUp(KeyCode.E))
+            {
+                timer = 0;
+                interactSlider.value = timer;
             }
         }
 
-        if(pois == true)
+        if (!isInFood)
+            interactCanvas.SetActive(false);
+
+        if (pois == true)
         {
             health += drainTime * 3f * Time.deltaTime;
         }
@@ -147,4 +171,29 @@ public class PlayerStats : MonoBehaviour
     }
 
     #endregion
+
+    void DeathTime()
+    {
+        //Activate RigidBody
+        Destroy(this.gameObject, 5);
+    }
+
+    void ShowInteract()
+    {
+        timer += Time.deltaTime;
+
+        interactSlider.value = timer;
+        interactSlider.maxValue = duriation;
+
+        if (timer >= duriation && isInWater)
+        {
+            thirst += nutrition;
+            timer = 0;
+        }
+        if (timer >= duriation && isInFood)
+        {
+            hunger += nutrition;
+            timer = 0;
+        }
+    }
 }
