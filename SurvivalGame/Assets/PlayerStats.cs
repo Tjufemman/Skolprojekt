@@ -81,7 +81,8 @@ public class PlayerStats : MonoBehaviour
 
         if (health <= 0)
         {
-            DeathTime();
+            GetComponent<RagdollActive>().DoRagdoll(true);
+            StartCoroutine(DeathTime());
         }
 
         if(isInWater)
@@ -172,10 +173,13 @@ public class PlayerStats : MonoBehaviour
 
     #endregion
 
-    void DeathTime()
+    IEnumerator DeathTime()
     {
+        FindObjectOfType<GameManager>().playerDead = true;
+        yield return new WaitForSeconds(7);
         //Activate RigidBody
-        Destroy(this.gameObject, 5);
+        Destroy(this.gameObject);
+
     }
 
     void ShowInteract()
