@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -12,17 +14,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject DeathMenu;
     [SerializeField] Camera cam2;
     private Camera cam1;
-    [SerializeField] TMP_Text text1;
-    [SerializeField] TMP_Text text2;
-    [SerializeField] TMP_Text text3;
-    [SerializeField] TMP_Text text4;
-    [SerializeField] TMP_Text text5;
 
-
-
+    [SerializeField] GameObject[] texts;
 
     public bool playerDead = false;
-    private Animator anim;
+    private Animator[] anim;
+
+    [SerializeField] GameObject[] disableThese;
 
 
     // Start is called before the first frame update
@@ -31,54 +29,103 @@ public class GameManager : MonoBehaviour
         DeathMenu.SetActive(false);
         cam2.enabled = false;
         cam1 = FindObjectOfType<Camera>();
-        anim = FindObjectOfType<Animator>(); 
-        
+        anim = FindObjectsOfType<Animator>();
+
+        Time.timeScale = 1.0f;
     }
 
     // Update is called once per frame
     void Update()
-    {       
+    {
 
-        if(playerDead == true)
+        if (playerDead == true)
         {
-            DeathMenu.SetActive(true);
-            cam1.enabled = false;
-            cam2.transform.position = player.transform.position;
-            anim.SetBool("Dead", true);
-            cam2.enabled = true;
-
+            Destroy(GameObject.FindWithTag("Enemy"));
             StartCoroutine(DisplayScreen());
-                     
+
+            cam1.enabled = false;
+            cam2.enabled = true;
+            
+            AudioListener listen = FindObjectOfType<AudioListener>();
+            listen.enabled = true;
+
+            for (int i = 0; i < anim.Length; i++)
+            {
+                anim[1].SetBool("Dead", true);
+            }
+
+            for (int i = 0; i <= disableThese.Length; i++)
+            {
+                disableThese[i].SetActive(false);
+            }
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (GameIsPaused)
+            {
+                Resume();
+            } else
+            {
+                PausingGame();
+            }
         }
 
     }
+
+    int currentIndex = 0;
+
     IEnumerator DisplayScreen()
     {
-        yield return new WaitForSeconds(0.5f);
-        text1.gameObject.SetActive(true);
-        yield return new WaitForSeconds(7);
-        text1.gameObject.SetActive(false);
+
+        yield return new WaitForSeconds(4);
+        DeathMenu.SetActive(true);
 
         yield return new WaitForSeconds(0.5f);
-        text2.gameObject.SetActive(true);
-        yield return new WaitForSeconds(7);
-        text2.gameObject.SetActive(false);
+        texts[currentIndex].SetActive(true);
 
-        yield return new WaitForSeconds(0.5f);
-        text3.gameObject.SetActive(true);
-        yield return new WaitForSeconds(7);
-        text3.gameObject.SetActive(false);
+        if (Input.anyKeyDown)
+        {
+            texts[currentIndex].SetActive(false);
+            texts[currentIndex + 1].SetActive(true);
 
-        yield return new WaitForSeconds(0.5f);
-        text4.gameObject.SetActive(true);
-        yield return new WaitForSeconds(7);
-        text4.gameObject.SetActive(false);
+            currentIndex++;
+        }
 
-        yield return new WaitForSeconds(0.5f);
-        text5.gameObject.SetActive(true);
-        yield return new WaitForSeconds(7);
-        text5.gameObject.SetActive(false);
+    }
 
+    public static bool GameIsPaused = false;
+
+    public GameObject pausMenu;
+
+    public void PausingGame()
+    {
+        Cursor.lockState = CursorLockMode.None;
+
+        pausMenu.SetActive(true);
+        Time.timeScale = 0f;
+        GameIsPaused = true;
+
+    }
+
+    public void Resume()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        pausMenu.SetActive(false);
+        Time.timeScale = 1f;
+        GameIsPaused = false;
+    }
+
+    public void Restart()
+    {
+        SceneManager.LoadScene("Game");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 
 }

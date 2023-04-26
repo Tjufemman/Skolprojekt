@@ -9,8 +9,7 @@ public class Movement : MonoBehaviour
 {
     CharacterController controller;
 
-    [SerializeField] float 
-        ogSpeed;
+    [SerializeField] float ogSpeed;
     [SerializeField] float speed = 10f;
     [SerializeField] float runSpeed = 15f;
 
@@ -30,6 +29,8 @@ public class Movement : MonoBehaviour
     [SerializeField] Animator anim;
 
     [SerializeField] Slider staminaSlider;
+
+    AudioSource walk;
 
     // Start is called before the first frame update
     void Start()
@@ -65,8 +66,7 @@ public class Movement : MonoBehaviour
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         } 
 
-
-        if(Input.GetKey(KeyCode.LeftShift) && stamina > 1)
+        if(Input.GetKey(KeyCode.LeftShift) && stamina > 1 && x + z >= 0)
         {
             speed = runSpeed;
             stamina -= Time.deltaTime * 4f;
@@ -97,18 +97,22 @@ public class Movement : MonoBehaviour
         if(Input.GetKey(KeyCode.W))
         {
             anim.SetBool("Walking", true);
+            walk.Play();
         }
         else if (Input.GetKey(KeyCode.S))
         {
             anim.SetBool("Walking", true);
+            walk.Play();
         }
         else if (Input.GetKey(KeyCode.D))
         {
             anim.SetBool("Walking", true);
+            walk.Play();
         }
         else if (Input.GetKey(KeyCode.A))
         {
             anim.SetBool("Walking", true);
+            walk.Play();
         } else
         {
             anim.SetBool("Walking", false);

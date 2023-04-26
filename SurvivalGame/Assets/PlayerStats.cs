@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Unity.VisualScripting;
-using Unity.VisualScripting.Dependencies.Sqlite;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.WSA;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -51,9 +50,17 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] Slider thirstSlider;
     [SerializeField] Slider interactSlider;
 
+    [SerializeField] GameObject body;
+
     [SerializeField] GameObject interactCanvas;
     public float duriation = 5f;
     float timer;
+
+    [SerializeField] GameObject interactCanvas1;
+    [SerializeField] Slider interactSlider1;
+
+    AudioSource eat;
+    AudioSource drinkWaA;
 
     // Update is called once per frame
     void Update()
@@ -81,26 +88,30 @@ public class PlayerStats : MonoBehaviour
 
         if (health <= 0)
         {
-            GetComponent<RagdollActive>().DoRagdoll(true);
+            Dead();
+            body.SetActive(false);
             StartCoroutine(DeathTime());
         }
 
         if(isInWater)
         {
             //Display Drink
-            interactCanvas.SetActive(true);
+            interactCanvas1.SetActive(true);
 
-            if(Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKey(KeyCode.E))
             {
                 ShowInteract();
-            } else
+                drinkWaA.Play();
+            }
+            else if (Input.GetKeyUp(KeyCode.E))
             {
                 timer = 0;
+                interactSlider1.value = timer;
             }
         }
 
         if (!isInWater)
-            interactCanvas.SetActive(false);
+            interactCanvas1.SetActive(false);
 
         if (isInFood)
         {
@@ -110,6 +121,7 @@ public class PlayerStats : MonoBehaviour
             if (Input.GetKey(KeyCode.E))
             {
                 ShowInteract();
+                eat.Play();
             }
             else if(Input.GetKeyUp(KeyCode.E))
             {
@@ -137,6 +149,18 @@ public class PlayerStats : MonoBehaviour
 
         #endregion
 
+    }
+
+    bool dead = false;
+    [SerializeField] ParticleSystem diePartical;
+
+    void Dead()
+    {
+        if (!dead)
+        {
+            Instantiate(diePartical, transform.position, Quaternion.identity);
+            dead = true;
+        }
     }
 
     private void OnDrawGizmos()
@@ -188,6 +212,9 @@ public class PlayerStats : MonoBehaviour
 
         interactSlider.value = timer;
         interactSlider.maxValue = duriation;
+
+        interactSlider1.value = timer;
+        interactSlider1.maxValue = duriation;
 
         if (timer >= duriation && isInWater)
         {
