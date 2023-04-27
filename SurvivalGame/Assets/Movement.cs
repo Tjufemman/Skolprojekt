@@ -13,7 +13,7 @@ public class Movement : MonoBehaviour
     [SerializeField] float speed = 10f;
     [SerializeField] float runSpeed = 15f;
 
-    [SerializeField][Range(-1, 20)] float stamina = 50f;
+    [SerializeField][Range(-1, 30)] float stamina = 50f;
     [SerializeField] float maxStamina = 15f;
 
     [SerializeField] float gravity = -9.81f;
@@ -29,8 +29,6 @@ public class Movement : MonoBehaviour
     [SerializeField] Animator anim;
 
     [SerializeField] Slider staminaSlider;
-
-    AudioSource walk;
 
     // Start is called before the first frame update
     void Start()
@@ -54,6 +52,12 @@ public class Movement : MonoBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
+
+        Vector2 input_vector = new Vector2(x, z);
+        input_vector.Normalize();
+
+        x = input_vector.x;
+        z = input_vector.y;
 
         Vector3 move = transform.right * x + transform.forward * z;
         controller.Move(speed * Time.deltaTime * move);
@@ -96,23 +100,18 @@ public class Movement : MonoBehaviour
 
         if(Input.GetKey(KeyCode.W))
         {
-            anim.SetBool("Walking", true);
-            walk.Play();
-        }
+            anim.SetBool("Walking", true);        }
         else if (Input.GetKey(KeyCode.S))
         {
             anim.SetBool("Walking", true);
-            walk.Play();
         }
         else if (Input.GetKey(KeyCode.D))
         {
             anim.SetBool("Walking", true);
-            walk.Play();
         }
         else if (Input.GetKey(KeyCode.A))
         {
             anim.SetBool("Walking", true);
-            walk.Play();
         } else
         {
             anim.SetBool("Walking", false);

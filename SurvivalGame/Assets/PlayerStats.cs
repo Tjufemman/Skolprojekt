@@ -220,11 +220,14 @@ public class PlayerStats : MonoBehaviour
         {
             thirst += nutrition;
             timer = 0;
+            thirstSlider.value = thirst;
+
         }
         if (timer >= duriation && isInFood)
         {
             hunger += nutrition;
             timer = 0;
+            hungerSlider.value = hunger;
         }
     }
 }

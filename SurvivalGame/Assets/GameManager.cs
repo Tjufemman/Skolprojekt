@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     private Animator[] anim;
 
     [SerializeField] GameObject[] disableThese;
+    [SerializeField] GameObject textDonate;
 
 
     // Start is called before the first frame update
@@ -31,6 +32,8 @@ public class GameManager : MonoBehaviour
         cam1 = FindObjectOfType<Camera>();
         anim = FindObjectsOfType<Animator>();
 
+        GameIsPaused = false;
+
         Time.timeScale = 1.0f;
     }
 
@@ -40,6 +43,8 @@ public class GameManager : MonoBehaviour
 
         if (playerDead == true)
         {
+            
+
             Destroy(GameObject.FindWithTag("Enemy"));
             StartCoroutine(DisplayScreen());
 
@@ -78,6 +83,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator DisplayScreen()
     {
+        Cursor.lockState = CursorLockMode.None;   
 
         yield return new WaitForSeconds(4);
         DeathMenu.SetActive(true);
@@ -91,8 +97,8 @@ public class GameManager : MonoBehaviour
             texts[currentIndex + 1].SetActive(true);
 
             currentIndex++;
-        }
-
+        } 
+            
     }
 
     public static bool GameIsPaused = false;
